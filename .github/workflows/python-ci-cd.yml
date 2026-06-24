@@ -1,0 +1,93 @@
+name: Python CI & Build
+
+permissions:
+  contents: write
+
+on:
+  push:
+    paths:
+      - "*.py"
+      - ".github/workflows/python*"
+  release:
+    types: [published]
+
+jobs:
+  setup-python:
+    name: Setup Python workspace
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Create venv & install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Upload workspace as artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-workspace
+          path: ./
+
+  lint-python:
+    name: Lint Python code
+    needs: setup-python
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: python-workspace
+
+      - name: Restore the same Python version
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Restore venv script permissions
+        run: chmod -R +x venv/bin
+
+      - name: Run pylint
+        run: venv/bin/pylint *.py
+
+  test-python:
+    name: Run tests
+    needs: setup-python
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: python-workspace
+
+      - name: Restore the same Python version
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Restore venv script permissions
+        run: chmod -R +x venv/bin
+
+      - name: Run pytest
+        run: venv/bin/pytest test.py
+
+  build_arm64:
+    uses: learning-actions-in-persian/reusable-workflow/.github/workflows/reusable-build.yaml@main
+    with:
+      arch: arm64
+
+  build_amd64:
+    uses: learning-actions-in-persian/reusable-workflow/.github/workflows/reusable-build.yaml@main
+    with:
+      arch: x86_64
+
