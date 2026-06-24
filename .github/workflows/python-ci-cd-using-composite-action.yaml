@@ -99,12 +99,12 @@ jobs:
           python-version: "3.12"
 
       - name: Build amd64 executable
-        uses: learning-actions-in-persian/custom-action/custom-action@main
+        uses: learning-actions-in-persian/custom-action@main
         with:
           arch: x86_64
           
       - name: Build arm64 executable
-        uses: learning-actions-in-persian/custom-action/custom-action@main
+        uses: learning-actions-in-persian/custom-action@main
         with:
           arch: arm64
 
