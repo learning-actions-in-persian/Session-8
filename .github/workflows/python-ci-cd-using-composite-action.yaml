@@ -98,6 +98,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Restore venv script permissions
+        run: chmod -R +x venv/bin
+
       - name: Build amd64 executable
         uses: learning-actions-in-persian/custom-action@main
         with:
